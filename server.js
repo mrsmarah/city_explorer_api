@@ -20,7 +20,7 @@ app.get('/bad', (request, response) => {
 
 app.get('/location', (request, response) => {
   try {
-    const geoData = require('data/geo.json');
+    const geoData = require('./data/geo.json');
     const city = request.query.city;
     const locationData = new Location(city, geoData);
     response.status(200).json(locationData);
