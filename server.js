@@ -7,8 +7,8 @@ const cors = require('cors');
 
 // Application Setup:
 const PORT = process.env.PORT || 4000;
-const app = express();
-app.use(cors());
+const app = express(); //creating the server, waiting for the app.listen
+app.use(cors());//will respond to any request
 
 // API Routes:
 app.get('/', (request, response) => {
@@ -31,12 +31,11 @@ app.get('/location', (request, response) => {
 app.get('/weather', (request, response) => {
   try {
     const skyData = require('./data/darksky.json');
-    const city = request.query.city;
-    for ( var i=0 ; i<8 ; i++){
-    new Weather(city, skyData.data[i]);
-    }
-    response.status(200).json(eightDaysArr);
-    eightDaysArr =[];
+    const allDaysArr =[];
+    skyData.data.forEach((day) =>{
+      allDaysArr.push(new Weather(day))
+    })
+    response.status(200).json(allDaysArr);
   } catch (error) {errorHandler(error, request, response);}  
 });
 
@@ -49,18 +48,10 @@ function Location(city, geoData) {
   this.latitude = geoData[0].lat;
   this.longitude = geoData[0].lon;
 }
-// let str = skyData.data[0].valid_date;
-// var b = str.split(/\D/);
-// var date = new Date(b[0],b[1]-1,b[2],b[3],b[4],b[5]);
-// console.log(date);
-
 //weather constructor:
-var eightDaysArr =[];
-function Weather(city, skyData) {
-  this.search_query = city;
-  this.valid_date = skyData.valid_date;
-  this.weather = skyData.weather.description;
-  eightDaysArr.push(this);
+function Weather(skyData) {
+  this.forecast = skyData.weather.description;
+  this.time = new Date(skyData.valid_date).toDateString();
 }
 // Helper Functios:
 function notFoundHandler(request, response) {
